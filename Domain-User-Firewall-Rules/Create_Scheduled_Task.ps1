@@ -1,24 +1,30 @@
-#Set seach domain (Case Sensitive)
-$domain = 'LAB'
-#Set application name
+#Set variables =========================================================
 $appName = "Example App"
-#Set the AppData path to the executable
-$appDataPath = "AppData\Local\Example App\App.exe"
+$scriptName = "Create_Firewall_Rules.ps1"
+$folderPath = "$Env:public\"
+#=======================================================================
  
-#Find all user profiles matching the search domain
-$profiles = 'Registry::HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\ProfileList\*'
-$accounts = Get-ItemProperty -path $profiles
-Foreach ($account in $accounts) {
-    $objUser = New-Object System.Security.Principal.SecurityIdentifier($account.PSChildName)
-    $objName = $objUser.Translate([System.Security.Principal.NTAccount])
-    $account.PSChildName = $objName.value
+#Set paths
+$scriptFolder = "$folderPath$appname"
+$scriptFile = "$scriptFolder\$scriptName"
+ 
+#Create the public app directory if it does not already exist
+if (!(Test-Path -PathType Container "$scriptFolder")){
+    New-Item -ItemType Directory -Path "$scriptFolder"
 }
-$users = $accounts | Where-Object {$_.PSChildName -like "*$domain*"} | Select-Object -ExpandProperty PSChildName
-$users = $users.Replace("$domain\","")
- 
-#Create a firewall exception for each user profile found
-Foreach ($user in $users) {
-    if (!(Get-NetFirewallRule -DisplayName "$appname $user" -ErrorAction SilentlyContinue)){
-        New-NetFirewallRule -DisplayName "$appName $user" -Direction Inbound -Protocol TCP -LocalPort Any -RemoteAddress Any -Program "C:\Users\$user\$appDataPath" -Action Allow
-    }
+   
+#Copy the firewall rules script to the public app directory if it does not already exist
+if (!(Test-Path "$scriptFile")){
+    Copy-Item "$PSScriptRoot\$scriptName" -Destination "$scriptFolder"
+}
+   
+#Create a scheduled task to run the firewall rules script at user logon
+$taskName = "Create $appName Firewall Rules"
+$task = Get-ScheduledTask | Where-Object -Property TaskName -eq $taskName | Select-Object -ExpandProperty TaskName -ErrorAction SilentlyContinue
+if (!($task)){
+    $action = New-ScheduledTaskAction -Execute 'Powershell.exe' `
+    -Argument "-ExecutionPolicy Bypass -File $scriptFile"
+    $trigger =  New-ScheduledTaskTrigger -AtLogon
+    $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit 00:05:00
+    Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "$taskName" -User "System" -Settings $settings -Description "Creates firewall rules to allow $appName for all domain users."
 }
