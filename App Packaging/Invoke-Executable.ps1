@@ -10,8 +10,8 @@ Function Invoke-Executable
     .PARAMETER Arguments
         Specify additional arguments to pass to the .exe file (Comma seperated list)
 
-	.PARAMETER ExitCodes
-		Specify non-standard success exit codes (Comma seperated list)
+    .PARAMETER ExitCodes
+        Specify non-standard success exit codes (Comma seperated list)
 
     .EXAMPLE
         Install a .exe file
@@ -48,7 +48,7 @@ Function Invoke-Executable
     #Create a list to store arguments
     $ArgumentList = New-Object 'System.Collections.Generic.List[string]'
 
-	#Convert the exit codes to a list
+    #Convert the exit codes to a list
     if($ExitCodes){$ExitSplit = $ExitCodes.Split(',')}
 
     #Add any additional arguments to the list

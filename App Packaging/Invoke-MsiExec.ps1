@@ -22,8 +22,8 @@ Function Invoke-MsiExec
     .PARAMETER Arguments
         Specify additional arguments to pass to the .msi (or .msp) file (Comma seperated list)
 	
-	.PARAMETER ExitCodes
-		Specify non-standard success exit codes (Comma seperated list)
+    .PARAMETER ExitCodes
+        Specify non-standard success exit codes (Comma seperated list)
 
     .EXAMPLE
         Install a .msi file
@@ -60,7 +60,7 @@ Function Invoke-MsiExec
     })]
     [System.IO.FileInfo]$FilePath,
     [Parameter(Mandatory = $false)][ValidateNotNullOrEmpty()][String]$Arguments,
-	[Parameter(Mandatory = $false)][ValidateNotNullOrEmpty()][String]$ExitCodes,
+    [Parameter(Mandatory = $false)][ValidateNotNullOrEmpty()][String]$ExitCodes,
     [Parameter(Mandatory = $false)][ValidateNotNullOrEmpty()][Switch]$Install,
     [Parameter(Mandatory = $false)][ValidateNotNullOrEmpty()][Switch]$Uninstall,
     [Parameter(Mandatory = $false)][ValidateNotNullOrEmpty()][Switch]$Patch,
@@ -80,7 +80,7 @@ Function Invoke-MsiExec
     #Create a list to store arguments
     $ArgumentList = New-Object 'System.Collections.Generic.List[string]'
 	
-	#Convert the exit codes to a list
+    #Convert the exit codes to a list
     if($ExitCodes){$ExitSplit = $ExitCodes.Split(',')}
 
     #Add the install, uninstall, or patch argument to the list
