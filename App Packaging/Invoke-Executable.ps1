@@ -15,14 +15,14 @@ Function Invoke-Executable
 
     .EXAMPLE
         Install a .exe file
-            Invoke-Executable -FilePath "$PSScriptRoot\Setup.exe" -Arguments '/S /v"/qn REBOOT=reallysuppress"'
+            Invoke-Executable -FilePath "$PSScriptRoot\Setup.exe" -Arguments '/S,/v"/qn REBOOT=reallysuppress"'
 
         Install a .exe file with non-standard exit codes 2 and 8
             Invoke-Executable -FilePath "$PSScriptRoot\Setup.exe" -Arguments '/S' -ExitCodes '2,8'
 
     .NOTES
         Created by: Jon Anderson (@ConfigJon)
-        Modified: 1/17/2020
+        Modified: 1/30/2020
 #>
     param(
     [ValidateScript({
